@@ -16,5 +16,5 @@ module Pi_mod(in, out, clk, rst);
 		out <= 0;
 	else
 		out <= out_comb;
-		
+
 endmodule
