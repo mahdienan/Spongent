@@ -26,34 +26,28 @@ module tb_pLayer;
 
 	// Inputs
 	reg [263:0] state_in;
-	reg [31:0] index;
 	reg clk;
 	reg rst;
 
 	// Outputs
-	wire [263:0] state_out;
+	wire [263:0] 	state_out;
+	wire				out_rdy;
 	
-	reg [31:0] ticks;
-
 	// Instantiate the Unit Under Test (UUT)
 	pLayer uut (
 		.state_in(state_in), 
 		.state_out(state_out),
-		.index(index), 
 		.clk(clk), 
-		.rst(rst)
+		.rst(rst),
+		.out_rdy(out_rdy)
 	);
 	
 	integer i;
 	initial begin
 		// Initialize Inputs
 		state_in = 0;
-		index = 0;
 		clk = 0;
 		rst = 1;
-		
-		ticks = 0;
-		
 		
 		// Wait 100 ns for global reset to finish
 		#100;
@@ -65,14 +59,12 @@ module tb_pLayer;
 		end
 		$display("state in: %h", state_in);
 		
-		for (i=0; i<`nSBox; i=i+1) begin
-			index <= i;
-			ticks = ticks + 1;
-			#5; //$display("tick");
-			
+		repeat (66)
+			#5;
+
+		if (out_rdy) begin
+			$display("state out: %h", state_out);
 		end
-		$display("state out: %h", state_out);
-		$display("calculation took %d ticks.", ticks);
 	end
 
    always begin
@@ -80,4 +72,3 @@ module tb_pLayer;
    end
 
 endmodule
-
