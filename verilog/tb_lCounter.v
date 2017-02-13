@@ -6,7 +6,7 @@
 //
 // Create Date:   10:05:08 01/18/2017
 // Design Name:   lCounter
-// Module Name:   /home/cie/Xilinx/projects/spongent/tb_lCounter.v
+// Module Name:   tb_lCounter.v
 // Project Name:  spongent
 // Target Device:  
 // Tool versions:  

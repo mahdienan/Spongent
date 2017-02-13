@@ -1,10 +1,11 @@
 `include "constants.vh"
 
-module pLayer(state_in, state_out, clk, rst, out_rdy);
+module pLayer(state_in, state_out, clk, rst, out_rdy, en);
 
    input 						clk;
    input 						rst;
 	input  			[263:0]	state_in;
+	input							en;
 	
 	output 	reg	[263:0]	state_out;
 	output	reg				out_rdy;
@@ -42,9 +43,9 @@ module pLayer(state_in, state_out, clk, rst, out_rdy);
 			state_comb = 0;
 			idx = 0;
 			out_rdy = 0;
-		end else begin
+		end else if(en) begin
 			for (j=0; j<8; j=j+1) begin
-				x = (state_in[(idx*8)+:8]>>j) & 264'b1;
+				x = (state_in[(idx*8)+:8]>>j) & 8'b00000001;
 				PermutedBitNo = pi_out_field[j][idx];
 				y = PermutedBitNo>>3;
 				permute[y] = permute[y] ^ (x << (PermutedBitNo - 8*y));
@@ -57,5 +58,4 @@ module pLayer(state_in, state_out, clk, rst, out_rdy);
 			idx = idx + 1;
 		end
 		end
-	
 endmodule

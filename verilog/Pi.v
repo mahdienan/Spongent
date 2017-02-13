@@ -12,9 +12,6 @@ module Pi_mod(in, out, clk, rst);
 									`nBits-1;
 
 	always@(posedge clk)
-	if (rst)
-		out <= 0;
-	else
 		out <= out_comb;
 
 endmodule

@@ -6,7 +6,7 @@
 //
 // Create Date:   10:44:35 01/18/2017
 // Design Name:   Pi
-// Module Name:   tb_Pi.v
+// Module Name:   spongent/tb_Pi.v
 // Project Name:  spongent
 // Target Device:  
 // Tool versions:  

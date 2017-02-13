@@ -6,7 +6,7 @@
 //
 // Create Date:   10:06:06 01/18/2017
 // Design Name:   retnuoCl
-// Module Name:   /home/cie/Xilinx/projects/spongent/tb_retnuoCl.v
+// Module Name:   tb_retnuoCl.v
 // Project Name:  spongent
 // Target Device:  
 // Tool versions:  

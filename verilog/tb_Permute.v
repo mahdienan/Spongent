@@ -1,18 +1,18 @@
 `timescale 1ns / 1ps
 `include "constants.vh"
 ////////////////////////////////////////////////////////////////////////////////
-// Company: TU Darmstadt
-// Engineer: Mahdi Enan
+// Company: 
+// Engineer:
 //
-// Create Date:   09:55:48 01/21/2017
-// Design Name:   pLayer
-// Module Name:   tb_pLayer.v
+// Create Date:   14:54:14 01/28/2017
+// Design Name:   Permute
+// Module Name:   
 // Project Name:  spongent
 // Target Device:  
 // Tool versions:  
 // Description: 
 //
-// Verilog Test Fixture created by ISE for module: pLayer
+// Verilog Test Fixture created by ISE for module: Permute
 //
 // Dependencies:
 // 
@@ -22,52 +22,66 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module tb_pLayer;
+module tb_Permute;
 
 	// Inputs
 	reg [263:0] state_in;
+	reg [15:0] IV_in, INV_IV_in;
 	reg clk;
 	reg rst;
 	reg en;
 
+	reg [31:0] index;
+
 	// Outputs
-	wire [263:0] 	state_out;
-	wire				out_rdy;
-	
+	wire [263:0] state_out;
+	wire [15:0] IV_out, INV_IV_out;
+	wire rdy;
+
 	// Instantiate the Unit Under Test (UUT)
-	pLayer uut (
+	Permute uut (
 		.state_in(state_in), 
+		.IV_in(IV_in),
+		.INV_IV_in(INV_IV_in),
 		.state_out(state_out),
+		.IV_out(IV_out),
+		.INV_IV_out(INV_IV_out),
 		.clk(clk), 
 		.rst(rst),
 		.en(en),
-		.out_rdy(out_rdy)
+		.index(index),
+		.rdy(rdy)
 	);
 	
-	//integer i;
+	integer i;
 	initial begin
 		// Initialize Inputs
+		index = 0;
 		state_in = 0;
 		clk = 0;
 		rst = 1;
+		en = 0;
+		//#5 rst = 0;
 		// Wait 100 ns for global reset to finish
 		#100;
-		rst = 0;
 		// Add stimulus here
+		rst = 0;
+		IV_in = 16'hc6;
+		INV_IV_in = 16'h0;
 		$display("[INITIALIZING]");
-		en = 1;
-		/*for (i=0; i<`nSBox; i=i+1) begin
+		for (i=0; i<`nSBox; i=i+1) begin
 			state_in = state_in | i<<(i*8);
-		end*/
-		state_in = 264'h20d6d3dcd9d5d8dad7dfd4d1d2d0dbdddee6e3ece9e5e8eae7efe4e1e2e0ebed94;
-		$display("state in: %h", state_in);
-		
-		repeat (66)
-			#5;
-
-		if (out_rdy) begin
-			$display("state out: %h", state_out);
 		end
+		$display("state in: %h", state_in);
+		en = 1;
+		repeat (70) begin // takes 70 cycles (optimizable?)
+			#5;
+		end
+		en = 0;
+		if (rdy) begin
+			$display("state_out: %h", state_out);
+		end
+		
 	end
 
    always begin
@@ -75,3 +89,4 @@ module tb_pLayer;
    end
 
 endmodule
+
