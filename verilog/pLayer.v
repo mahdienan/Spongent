@@ -43,6 +43,8 @@ module pLayer(state_in, state_out, clk, rst, out_rdy, en);
 			state_comb = 0;
 			idx = 0;
 			out_rdy = 0;
+			for (k=0; k<`nSBox; k=k+1)
+				permute[k] = 0;
 		end else if(en) begin
 			for (j=0; j<8; j=j+1) begin
 				x = (state_in[(idx*8)+:8]>>j) & 8'b00000001;
@@ -54,6 +56,8 @@ module pLayer(state_in, state_out, clk, rst, out_rdy, en);
 			if (idx==32) begin
 				state_out = state_comb;
 				out_rdy = 1'b1;
+			end else begin
+				out_rdy = 1'b0;
 			end
 			idx = idx + 1;
 		end

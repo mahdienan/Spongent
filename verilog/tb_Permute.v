@@ -31,8 +31,6 @@ module tb_Permute;
 	reg rst;
 	reg en;
 
-	reg [31:0] index;
-
 	// Outputs
 	wire [263:0] state_out;
 	wire [15:0] IV_out, INV_IV_out;
@@ -49,22 +47,22 @@ module tb_Permute;
 		.clk(clk), 
 		.rst(rst),
 		.en(en),
-		.index(index),
 		.rdy(rdy)
 	);
 	
-	integer i;
+	reg [31:0] iteration;
+	
+	integer i, j;
 	initial begin
 		// Initialize Inputs
-		index = 0;
 		state_in = 0;
 		clk = 0;
 		rst = 1;
 		en = 0;
-		//#5 rst = 0;
+		iteration = 0;
 		// Wait 100 ns for global reset to finish
 		#100;
-		// Add stimulus here
+		// Add stimulus here (run for 49.00us)
 		rst = 0;
 		IV_in = 16'hc6;
 		INV_IV_in = 16'h0;
@@ -72,16 +70,26 @@ module tb_Permute;
 		for (i=0; i<`nSBox; i=i+1) begin
 			state_in = state_in | i<<(i*8);
 		end
+		j = 0;
 		$display("state in: %h", state_in);
 		en = 1;
-		repeat (70) begin // takes 70 cycles (optimizable?)
+		repeat (135) begin
+			rst = 0;
+			repeat (70) begin // takes 70 cycles (optimizable?)
+				#5;
+			end
+			if (rdy) begin
+				// feed new state input
+				state_in = state_out;
+				IV_in = IV_out;
+				INV_IV_in = INV_IV_out;
+			end
+			rst = 1;
+			j = j+1;
+			if (j == 135)
+				$display("state_out: %h", state_out);
 			#5;
 		end
-		en = 0;
-		if (rdy) begin
-			$display("state_out: %h", state_out);
-		end
-		
 	end
 
    always begin

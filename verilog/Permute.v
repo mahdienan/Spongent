@@ -19,52 +19,44 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module Permute(state_in, IV_in, INV_IV_in, state_out, IV_out, INV_IV_out, clk, rst, en, index, rdy);
+module Permute(state_in, IV_in, INV_IV_in, state_out, IV_out, INV_IV_out, clk, rst, en, rdy);
 	input		[263:0]	state_in;	// input  of 33 iterations
 	input		[ 15:0]	IV_in;
 	input		[ 15:0]	INV_IV_in;
 	input					rst;
 	input					clk;
 	input					en;
-	input		[ 31:0]	index;
 	output reg[263:0] state_out;	// output of 33 iterations
 	output reg[ 15:0]	IV_out;
 	output reg[ 15:0]	INV_IV_out;
 	output reg			rdy;
 	
-	reg	[ 15:0] 	i;
-	
-	reg [263:0]tmp_state;
-	
+	reg	[  15:0] i;
+	reg 	[ 263:0]	tmp_state;
 	reg 	[2048:0]	sBoxLayer;
+	reg 				wr_en;
 	
-	reg				pLayer_enable;
-	reg	[263:0]	pLayer_state_in;
-	wire	[263:0]	pLayer_state_out;
-	wire				pLayer_out_rdy;
-	
-	
-	reg wr_en;
 
-	wire [15:0] lCounter_out, retnuoCl_out;
+	wire  [  15:0] lCounter_out, retnuoCl_out;
 	lCounter lCounter_instance(.lfsr(IV_in), .out(lCounter_out));
 	retnuoCl retnuoCl_instance(.lfsr(IV_in), .out(retnuoCl_out));
+	
+	reg				pLayer_enable;
+	reg	[ 263:0]	pLayer_state_in;
+	wire	[ 263:0]	pLayer_state_out;
+	wire				pLayer_out_rdy;
+	pLayer pLayer_instance (.clk(clk), 
+									.rst(rst),
+									.state_in(pLayer_state_in), 
+									.state_out(pLayer_state_out), 
+									.out_rdy(pLayer_out_rdy),
+									.en(pLayer_enable)
+									);
 
 	initial begin
 		`INIT_SBOX_LAYER;
 	end
-	
-	generate begin
-		pLayer pLayer_instance (
-		.clk(clk), 
-		.rst(rst),
-		.state_in(pLayer_state_in), 
-		.state_out(pLayer_state_out), 
-		.out_rdy(pLayer_out_rdy),
-		.en(pLayer_enable)
-	);
-	end endgenerate
-	
+
 	integer j;
 	always @ (posedge clk or posedge rst) begin
 		if (rst) begin
@@ -91,13 +83,16 @@ module Permute(state_in, IV_in, INV_IV_in, state_out, IV_out, INV_IV_out, clk, r
 				tmp_state[j+:8] = sBoxLayer[(tmp_state[j+:8]*8)+:8];
 			end
 			if (wr_en) begin
-				$display("feeding player: %h", tmp_state);
 				wr_en = 0;
-				pLayer_enable = 1;
 				pLayer_state_in = tmp_state;
-			end else	if (pLayer_out_rdy) begin
+				pLayer_enable = 1;
+			end
+			
+			if (pLayer_out_rdy) begin
 				state_out = pLayer_state_out;
 				rdy = 1;
+			end else begin
+				rdy = 0;
 			end
 		end
 	end

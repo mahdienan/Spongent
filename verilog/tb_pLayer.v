@@ -56,12 +56,22 @@ module tb_pLayer;
 		// Add stimulus here
 		$display("[INITIALIZING]");
 		en = 1;
-		/*for (i=0; i<`nSBox; i=i+1) begin
-			state_in = state_in | i<<(i*8);
-		end*/
+
 		state_in = 264'h20d6d3dcd9d5d8dad7dfd4d1d2d0dbdddee6e3ece9e5e8eae7efe4e1e2e0ebed94;
 		$display("state in: %h", state_in);
+		repeat (66)
+			#5;
+
+		if (out_rdy) begin
+			$display("state out: %h", state_out);
+		end
 		
+		rst = 1; en = 0;
+		#5;
+		en = 1; rst = 0;
+		state_in = 264'ha8365886353658867333568863335688ca2ed1e22f3856833e55353353dd2d22a5;
+
+		$display("state in: %h", state_in);
 		repeat (66)
 			#5;
 
@@ -69,6 +79,7 @@ module tb_pLayer;
 			$display("state out: %h", state_out);
 		end
 	end
+
 
    always begin
 		#5; clk = !clk;
