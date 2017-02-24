@@ -7,7 +7,7 @@
 // Create Date:    15:37:20 01/22/2017 
 // Design Name: 
 // Module Name:    Permute 
-// Project Name: spongent
+// Project Name:   spongent
 // Target Devices: 
 // Tool versions: 
 // Description: 
@@ -66,7 +66,7 @@ module Permute(state_in, IV_in, INV_IV_in, state_out, IV_out, INV_IV_out, clk, r
 			pLayer_enable = 0;
 			wr_en = 1;
 			rdy = 0;
-		end else begin
+		end else if (en) begin
 			IV_out = 0;
 			INV_IV_out = 0;
 			state_out = 0;
@@ -74,7 +74,6 @@ module Permute(state_in, IV_in, INV_IV_in, state_out, IV_out, INV_IV_out, clk, r
 			tmp_state[ 7:0] = tmp_state[ 7:0] ^ (IV_in & 16'hff);
 			tmp_state[15:8] = tmp_state[15:8] ^ ((IV_in >> 8) & 16'hff);
 			INV_IV_out = retnuoCl_out;
-			
 			tmp_state[(`nSBox*8)-1:(`nSBox*8)-1-7] = tmp_state[(`nSBox*8)-1:(`nSBox*8)-1-7] ^ (INV_IV_out >> 8) & 8'hff;
 			tmp_state[(`nSBox*8)-8:(`nSBox*8)-1-15] = tmp_state[(`nSBox*8)-8:(`nSBox*8)-1-15] ^ INV_IV_out & 8'hff;
 			IV_out = lCounter_out;

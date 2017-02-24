@@ -1,10 +1,11 @@
 `ifndef _constants_vh_
 `define _constants_vh_
 
-`define nBits 264
-`define nSBox 33
+`define nBits 264				// = (capacity + rate) = (176 + 88)
+`define nSBox 33				// = (nBits / 8) = (264 / 8)
+`define rate 88
+`define R_SizeInBytes 11 	// = (rate / 8) = (88 / 8)
 `define nRounds 135
-
 
 `define INIT_SBOX_LAYER\
 sBoxLayer[0+:8] = 8'hee;\
