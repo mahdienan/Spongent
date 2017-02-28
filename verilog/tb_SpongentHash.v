@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: TU Darmstadt
+// Engineer: Florian Beyer
 // 
 // Create Date:    17:38:52 02/23/2017 
 // Design Name: 
@@ -20,18 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 module tb_SpongentHash;
 
-	reg [263:0]		data;
 	wire [87:0]		hash;
+	reg  [87:0]		reference_hash;
 	reg				clk;
 	reg				rst;
 	reg				en;
 	wire				rdy;
-	reg [31:0]  	databitlen;
 
 
 	SpongentHash uut (
-		.data_in(data), 
-		.databitlen_in(databitlen),
 		.clk(clk), 
 		.rst(rst), 
 		.en(en), 
@@ -41,26 +38,19 @@ module tb_SpongentHash;
 
 
 	initial begin
-		databitlen = 0;
-		data = 0;
 		clk = 0;
 		rst = 1;
 		en = 0;
-		
+		// Set reference Hash value, to test if the result is right.
+		// Hash for "Hello WorldHello World ZY"
+		// reference_hash = 88'ha9b5344ec2f458323a1acc;
+
+		// Hash for "Spongent is a lightweight Hashfunction"
+		reference_hash = 88'h06846ff7186c0cfa5dfd32;
 		#100;
 		
 		rst = 0;
 		en = 1;
-		
-		data = "Hello WorldHello WorldZY";
-		databitlen = 192;
-		repeat(5000) begin
-			#5;
-		end
-		
-		if (rdy == 1) begin
-			$display("hash %h", hash);
-		end
 	end
 
    always begin
@@ -70,6 +60,9 @@ module tb_SpongentHash;
 	always @ rdy begin
 		if (rdy == 1) begin
 			$display("hash %h", hash);
+			if (hash === reference_hash) begin
+				$display("SUCCESS");
+			end
 		end
 	end
 endmodule

@@ -1,4 +1,25 @@
-
+//////////////////////////////////////////////////////////////////////////////////
+// Company: TU Darmstadt
+// Engineer: Florian Beyer
+// 
+// Create Date:    17:38:52 02/23/2017 
+// Design Name: 
+// Module Name:    Absorb
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: This is the absorb module of Spongent. It represents the absorbing
+// phase of the hash function. If the improvements I mentioned in SpongentHash.v are
+// made, absorb needs to be changed too. As input it then just needs the counter,
+// the ram address of the actual block and en enable signal.
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module Absorb(state_in, state_out, clk, rst, en, rdy);
 	
 	input		 [263:0]	state_in;
@@ -15,21 +36,19 @@ module Absorb(state_in, state_out, clk, rst, en, rdy);
 	reg	[263:0]		temp_state;
 	
 	reg					permute_enable;
-	reg	[15:0]		permute_IV_in, permute_INV_IV_in;
+	reg	[15:0]		permute_IV_in;
 	reg	[263:0]		permute_state_in;
 	reg					permute_rst;
 	
 	wire  [263:0]		permute_state_out;
-	wire	[15:0]		permute_IV_out, permute_INV_IV_out;
+	wire	[15:0]		permute_IV_out;
 	wire					permute_out_rdy;
 		
 	Permute permute_instance (
 			.state_in(permute_state_in),
 			.IV_in(permute_IV_in),
-			.INV_IV_in(permute_INV_IV_in),
 			.state_out(permute_state_out),
 			.IV_out(permute_IV_out),
-			.INV_IV_out(permute_INV_IV_out),
 			.clk(clk),
 			.rst(permute_rst),
 			.en(permute_enable),
@@ -51,22 +70,25 @@ module Absorb(state_in, state_out, clk, rst, en, rdy);
 			iteration = 0;
 		end else if (en) begin
 			permute_rst = 0;
+			
+			// initialize temp_state here, if Absorb is enabled
 			if (temp_state == 0) begin
 				temp_state = state_in;
-			end 
+			end
 			
+			// Call Permute
 			if (wr_en) begin
 				wr_en = 0;
 				permute_IV_in = IV;
-				permute_INV_IV_in = INV_IV;
 				permute_state_in = temp_state;
 				permute_enable = 1;
 			end
-		
+			
+			// If Permute finished its computation, reenter it for 135 rounds.
+			// After the last round set Absorbs output ready.
 			if (permute_out_rdy) begin
 				temp_state = permute_state_out;
 				IV = permute_IV_out;
-				INV_IV = permute_INV_IV_out;
 				iteration = iteration + 1;
 				
 				if (iteration === 135) begin
